@@ -38,26 +38,37 @@ pub fn decompress(src: String, dest: String) -> Result<usize, DecompressionError
         return Err(DecompressionError::InvalidFormat)
     }
 
-    let head_end = head_end_op.unwrap();
-    println!("{}", head_end);
+    let head_end = head_end_op.unwrap() * 5;
     let x = &compressed[0..head_end].into();
     let head_map = build_map(x);
+    println!("{:?}", head_map);
     let cmp_body = &compressed[head_end+1..compressed.len()];
 
     let mut body: Bytes = vec![];
 
-    let mut idx = 0 as usize;
+    let mut idx: usize = 0;
     while idx < cmp_body.len() {
-        if cmp_body[idx] == 0 {
-            body.extend_from_slice(&cmp_body[idx+1..idx+5]);
+        let val = cmp_body[idx];
+        if val == 0 {
+            
+            // 0b00000000 0b10010001 0b00111010 0b10101100 0b00111100 ...
+            // idx        idx + 1    idx + 2    idx + 3    idx + 4    idx + ...
+            body.extend_from_slice(&cmp_body[idx+1..std::cmp::min(idx+5, cmp_body.len())]);
             idx += 5;
         } else {
-            body.extend_from_slice(head_map.get(&cmp_body[idx]).unwrap());
+
+            // 0b00001100
+            // idx
+            let x = match head_map.get(&val) {
+                Some(v) => *v,
+                None => panic!("At pos {idx}: There is no key -> {val}"),
+            };
+            body.extend_from_slice(x);
             idx += 1;
         }
     }
 
-    match fs::write(dest, &compressed) {
+    match fs::write(dest, &body) {
         Err(_) => Err(DecompressionError::WritingError),
         Ok(_) => Ok(body.len())
     }

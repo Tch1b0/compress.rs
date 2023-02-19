@@ -25,14 +25,15 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
+
     if args.decompress {
         match decompress(args.source_file, args.dest_file) {
-            Ok(s) => println!("done! New size: {} Bytes", s),
+            Ok(s) => println!("done! New size: {s} Bytes"),
             Err(_) => panic!("Something went wrong")
         }
     } else {
         match compress(args.source_file, args.dest_file) {
-            Ok(s) => println!("done! New size: {} Bytes", s),
+            Ok(s) => println!("done! New size: {s} Bytes"),
             Err(_) => panic!("Something went wrong")
         }
     }

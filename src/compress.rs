@@ -37,7 +37,7 @@ fn create_occurence_map(data: &Vec<u8>) -> OccurenceMap {
     let mut m: OccurenceMap = HashMap::new();
     
     for i in 0..data.len() {
-        if i % 4 != 0 { continue }
+        if i % 4 != 0 || i+3 >= data.len() { continue }
 
         let x = &data[i..=i+3];
         let key: Cluster = Cluster::from(x);
@@ -56,7 +56,7 @@ type Trend = Vec<(Cluster, u16)>;
 fn analyze_trend(occurences: OccurenceMap) -> Trend {
     let mut x: Vec<_> = occurences.into_iter().collect();
     x.sort_by_key(|v| v.1);
-    if x.len() > 245 {
+    if x.len() > 254 {
         x.drain(254..).collect()
     } else {
         x
@@ -84,7 +84,7 @@ fn build_body(content: &Bytes, trend: &Trend) -> Bytes {
     for i in 0..content.len() {
         if i % 4 != 0 { continue }
         
-        let slice = &content[i..=i+3];
+        let slice = &content[i..=std::cmp::min(i+3, content.len() - 1)];
         let trending_idx = trend.into_iter().position(
                 |(c, _)| *c == (Cluster::from(slice))
             );
@@ -121,4 +121,3 @@ pub fn compress(src: String, dest: String) -> Result<usize, CompressionError> {
         Ok(_) => Ok(compressed.len())
     }
 }
-
