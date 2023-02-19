@@ -11,7 +11,7 @@ pub enum DecompressionError {
 fn find_head_end(content: &Bytes) -> Option<usize> {
     for (idx, val) in content.into_iter().step_by(5).enumerate() {
         if *val == 0 {
-            return Some(idx);
+            return Some(idx * 5);
         }
     }
 
@@ -38,11 +38,10 @@ pub fn decompress(src: String, dest: String) -> Result<usize, DecompressionError
         return Err(DecompressionError::InvalidFormat)
     }
 
-    let head_end = head_end_op.unwrap() * 5;
-    let x = &compressed[0..head_end].into();
-    let head_map = build_map(x);
-    println!("{:?}", head_map);
-    let cmp_body = &compressed[head_end+1..compressed.len()];
+    let head_end = head_end_op.unwrap();
+    let head: &Bytes = &compressed[..head_end].into();
+    let head_map = build_map(head);
+    let cmp_body = &compressed[head_end+1..];
 
     let mut body: Bytes = vec![];
 
@@ -59,11 +58,10 @@ pub fn decompress(src: String, dest: String) -> Result<usize, DecompressionError
 
             // 0b00001100
             // idx
-            let x = match head_map.get(&val) {
+            body.extend_from_slice(match head_map.get(&val) {
                 Some(v) => *v,
                 None => panic!("At pos {idx}: There is no key -> {val}"),
-            };
-            body.extend_from_slice(x);
+            });
             idx += 1;
         }
     }

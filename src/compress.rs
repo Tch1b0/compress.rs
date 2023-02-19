@@ -20,14 +20,8 @@ impl Cluster {
 
 impl From<&[u8]> for Cluster {
     fn from(vals: &[u8]) -> Self {
-        let mut value: u32 = 0;
-        
-        if let [a, b, c, d] = vals {
-            value = ((*a as u32) << 24) + ((*b as u32) << 16) + ((*c as u32) << 8) + (*d as u32);
-        }
-
         Cluster {
-            value
+            value: u32::from_be_bytes(vals.try_into().expect("slice has incorrect length"))
         }
     }
 }
@@ -85,10 +79,13 @@ fn build_body(content: &Bytes, trend: &Trend) -> Bytes {
         if i % 4 != 0 { continue }
         
         let slice = &content[i..=std::cmp::min(i+3, content.len() - 1)];
-        let trending_idx = trend.into_iter().position(
+        let trending_idx: Option<usize> = match slice.len() {
+            4 => trend.into_iter().position(
                 |(c, _)| *c == (Cluster::from(slice))
-            );
-        
+            ),
+            _ => None,
+        };
+
         match trending_idx {
             // index offset by one because 0 is reserved
             Some(idx) => body.push((idx + 1) as u8),

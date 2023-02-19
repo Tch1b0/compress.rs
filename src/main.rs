@@ -25,7 +25,6 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-
     if args.decompress {
         match decompress(args.source_file, args.dest_file) {
             Ok(s) => println!("done! New size: {s} Bytes"),
