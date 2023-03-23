@@ -1,0 +1,15 @@
+version: "3"
+
+tasks:
+  build:
+    cmds:
+      - cargo build
+  run:
+    cmds:
+      - cargo run
+  test:
+    cmds:
+      - task: build
+      - ./target/debug/compress.exe -s ./text.txt -d ./text.compressed
+      - ./target/debug/compress.exe -s ./text.compressed -d ./text.decompressed.txt --decompress
+      - python ./bincomp.py ./text.txt ./text.decompressed.txt

@@ -1,1 +1,7 @@
+# build files
 /target
+
+# testing files
+text.txt
+text.compressed
+text.decompressed.txt
