@@ -38,7 +38,7 @@ pub fn decompress(src: String, dest: String) -> Result<usize, DecompressionError
         return Err(DecompressionError::InvalidFormat)
     }
 
-    let head_end = head_end_op.unwrap();
+    let head_end = head_end_op.unwrap_or(0);
     let head: &Bytes = &compressed[..head_end].into();
     let head_map = build_map(head);
     let cmp_body = &compressed[head_end+1..];

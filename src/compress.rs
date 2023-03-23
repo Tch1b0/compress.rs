@@ -7,17 +7,17 @@ pub enum CompressionError {
     WritingError
 }
 
-#[derive(Eq, Hash, PartialEq)]
+#[derive(Eq, Hash, PartialEq, Debug)]
 struct Cluster{
     value: u32,
 }
 
 impl Cluster {
     pub fn deconstruct(&self) -> [u8; 4] {
-        print!("{:b} ", self.value);
+        // fill array with 0
         let mut arr: [u8; 4] = [0; 4];
-        // lower/big endian issues, so reverse array
         let bytes: [u8; 4] = unsafe { std::mem::transmute(self.value) };
+        // reverse byte order
         for i in 0..=3 {
             arr[i] = bytes[3 - i];
         }
@@ -29,7 +29,7 @@ impl Cluster {
 impl From<&[u8]> for Cluster {
     fn from(vals: &[u8]) -> Self {
         Cluster {
-            value: u32::from_be_bytes(vals.try_into().expect("slice has incorrect length"))
+            value: u32::from_be_bytes((*vals).try_into().expect("slice has incorrect length"))
         }
     }
 }
@@ -43,6 +43,7 @@ fn create_occurence_map(data: &Vec<u8>) -> OccurenceMap {
 
         let x = &data[i..=i+3];
         let key: Cluster = Cluster::from(x);
+
         if m.contains_key(&key) {
             let (_, v) = m.get_key_value(&key).unwrap();
             m.insert(key, v + 1);
@@ -74,10 +75,8 @@ fn build_head(trend: &Trend) -> Bytes {
         // push the sequence one by one
         let sequence = &trend[i as usize - 1].0.deconstruct();
         for val in sequence {
-            print!(":{:8b}:", val);
             head.push(*val);
         }
-        println!();
     }
     
     head
