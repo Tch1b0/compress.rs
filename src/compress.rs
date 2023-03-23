@@ -14,7 +14,15 @@ struct Cluster{
 
 impl Cluster {
     pub fn deconstruct(&self) -> [u8; 4] {
-        unsafe { std::mem::transmute(self.value) }
+        print!("{:b} ", self.value);
+        let mut arr: [u8; 4] = [0; 4];
+        // lower/big endian issues, so reverse array
+        let bytes: [u8; 4] = unsafe { std::mem::transmute(self.value) };
+        for i in 0..=3 {
+            arr[i] = bytes[3 - i];
+        }
+
+        arr
     }
 }
 
@@ -66,8 +74,10 @@ fn build_head(trend: &Trend) -> Bytes {
         // push the sequence one by one
         let sequence = &trend[i as usize - 1].0.deconstruct();
         for val in sequence {
+            print!(":{:8b}:", val);
             head.push(*val);
         }
+        println!();
     }
     
     head
