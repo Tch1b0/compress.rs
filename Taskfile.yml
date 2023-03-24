@@ -10,6 +10,6 @@ tasks:
   test:
     cmds:
       - task: build
-      - ./target/debug/compress.exe -s ./text.txt -d ./text.compressed
-      - ./target/debug/compress.exe -s ./text.compressed -d ./text.decompressed.txt --decompress
-      - python ./bincomp.py ./text.txt ./text.decompressed.txt
+      - cargo run -- -s ./text.txt -d ./text.compressed
+      - cargo run -- -s ./text.compressed -d ./text.decompressed.txt --decompress
+      - python3 ./bincomp.py ./text.txt ./text.decompressed.txt

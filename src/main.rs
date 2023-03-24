@@ -33,7 +33,7 @@ fn main() {
     } else {
         match compress(args.source_file, args.dest_file) {
             Ok(s) => println!("done! New size: {s} Bytes"),
-            Err(_) => panic!("Something went wrong")
+            Err(e) => panic!("{:?}", e)
         }
     }
 }

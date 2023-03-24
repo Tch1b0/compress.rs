@@ -1,4 +1,4 @@
-use crate::general::Bytes;
+use crate::general::{Bytes, Cluster};
 use std::{fs, collections::HashMap};
 
 #[derive(Debug)]
@@ -7,48 +7,23 @@ pub enum CompressionError {
     WritingError
 }
 
-#[derive(Eq, Hash, PartialEq, Debug)]
-struct Cluster{
-    value: u32,
-}
-
-impl Cluster {
-    pub fn deconstruct(&self) -> [u8; 4] {
-        // fill array with 0
-        let mut arr: [u8; 4] = [0; 4];
-        let bytes: [u8; 4] = unsafe { std::mem::transmute(self.value) };
-        // reverse byte order
-        for i in 0..=3 {
-            arr[i] = bytes[3 - i];
-        }
-
-        arr
-    }
-}
-
-impl From<&[u8]> for Cluster {
-    fn from(vals: &[u8]) -> Self {
-        Cluster {
-            value: u32::from_be_bytes((*vals).try_into().expect("slice has incorrect length"))
-        }
-    }
-}
-
 type OccurenceMap = HashMap<Cluster, u16>;
 fn create_occurence_map(data: &Vec<u8>) -> OccurenceMap {
     let mut m: OccurenceMap = HashMap::new();
-    
-    for i in 0..data.len() {
-        if i % 4 != 0 || i+3 >= data.len() { continue }
+
+    for i in (0..data.len()).step_by(4) {
+        if i+3 >= data.len() { continue }
 
         let x = &data[i..=i+3];
         let key: Cluster = Cluster::from(x);
 
-        if m.contains_key(&key) {
-            let (_, v) = m.get_key_value(&key).unwrap();
-            m.insert(key, v + 1);
-        } else {
-            m.insert(key, 1);
+        match m.get_key_value(&key) {
+            Some(v) => {
+                m.insert(key, *v.1 + 1);
+            },
+            None => {
+                m.insert(key, 1);
+            }
         }
     }
 
@@ -58,7 +33,11 @@ fn create_occurence_map(data: &Vec<u8>) -> OccurenceMap {
 type Trend = Vec<(Cluster, u16)>;
 fn analyze_trend(occurences: OccurenceMap) -> Trend {
     let mut x: Vec<_> = occurences.into_iter().collect();
+    // sort the sequences by occurences
     x.sort_by_key(|v| v.1);
+    x = x.into_iter().rev().collect();
+
+    // only give a max of 254 keys, because the code will be stored in a byte and null is reserved
     if x.len() > 254 {
         x.drain(254..).collect()
     } else {
@@ -96,9 +75,11 @@ fn build_body(content: &Bytes, trend: &Trend) -> Bytes {
         };
 
         match trending_idx {
+            // append the sequence code
             // index offset by one because 0 is reserved
             Some(idx) => body.push((idx + 1) as u8),
             None => {
+                // set null byte to indicate that incoming sequence should be interpreted literal
                 body.push(0);
                 body.extend_from_slice(slice);
             }
@@ -113,14 +94,19 @@ pub fn compress(src: String, dest: String) -> Result<usize, CompressionError> {
     if raw_content.is_err() {
         return Err(CompressionError::InvalidPath);
     }
+
     let content = raw_content.unwrap();
     let trend = analyze_trend(create_occurence_map(&content));
     let head = build_head(&trend);
     let body = build_body(&content, &trend);
 
+    // init the compressed file with the head
     let mut compressed: Vec<u8> = head;
+    // seperate head from body with a null byte
     compressed.push(0);
+    // extend the compressed content with the body part
     compressed.extend(body);
+    println!("{compressed:?}");
  
     match fs::write(dest, &compressed) {
         Err(_) => Err(CompressionError::WritingError),
