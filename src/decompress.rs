@@ -21,7 +21,7 @@ fn find_head_end(content: &Bytes) -> Option<usize> {
 fn build_map(head: &Bytes) -> HashMap<u8, &[u8]> {
     let mut m: HashMap<u8, &[u8]> = HashMap::new();
     for (idx, code) in head.into_iter().step_by(5).enumerate() {
-        m.insert(*code, &head[idx+1..idx+5]);
+        m.insert(*code, &head[(idx*5)+1..(idx*5)+5]);
     }
 
     m
@@ -44,8 +44,8 @@ pub fn decompress(src: String, dest: String) -> Result<usize, DecompressionError
     let cmp_body = &compressed[head_end+1..];
 
     let mut body: Bytes = vec![];
-
     let mut idx: usize = 0;
+
     while idx < cmp_body.len() {
         let val = cmp_body[idx];
         if val == 0 {

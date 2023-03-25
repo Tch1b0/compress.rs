@@ -106,7 +106,6 @@ pub fn compress(src: String, dest: String) -> Result<usize, CompressionError> {
     compressed.push(0);
     // extend the compressed content with the body part
     compressed.extend(body);
-    println!("{compressed:?}");
  
     match fs::write(dest, &compressed) {
         Err(_) => Err(CompressionError::WritingError),

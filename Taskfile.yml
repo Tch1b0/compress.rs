@@ -12,4 +12,4 @@ tasks:
       - task: build
       - cargo run -- -s ./text.txt -d ./text.compressed
       - cargo run -- -s ./text.compressed -d ./text.decompressed.txt --decompress
-      - python3 ./bincomp.py ./text.txt ./text.decompressed.txt
+      - python ./bincomp.py ./text.txt ./text.decompressed.txt
