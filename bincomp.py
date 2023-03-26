@@ -31,4 +31,4 @@ for i, v in enumerate(zip(a, b)):
     else:
         equal_counter += 1
 
-print(f"File equality {equal_counter / a_len * 100:.2f}%")
+print(f"\nFile equality {equal_counter / a_len * 100:.2f}%")

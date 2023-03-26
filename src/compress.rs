@@ -7,7 +7,7 @@ pub enum CompressionError {
     WritingError
 }
 
-type OccurenceMap = HashMap<Cluster, u16>;
+type OccurenceMap = HashMap<Cluster, u128>;
 fn create_occurence_map(data: &Vec<u8>) -> OccurenceMap {
     let mut m: OccurenceMap = HashMap::new();
 
@@ -30,7 +30,7 @@ fn create_occurence_map(data: &Vec<u8>) -> OccurenceMap {
     m
 }
 
-type Trend = Vec<(Cluster, u16)>;
+type Trend = Vec<(Cluster, u128)>;
 fn analyze_trend(occurences: OccurenceMap) -> Trend {
     let mut x: Vec<_> = occurences.into_iter().collect();
     // sort the sequences by occurences

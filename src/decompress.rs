@@ -2,12 +2,14 @@ use std::{fs, collections::HashMap};
 
 use crate::general::Bytes;
 
+#[derive(Debug)]
 pub enum DecompressionError {
     InvalidPath,
     InvalidFormat,
     WritingError
 }
 
+// find the index of the head end
 fn find_head_end(content: &Bytes) -> Option<usize> {
     for (idx, val) in content.into_iter().step_by(5).enumerate() {
         if *val == 0 {
@@ -18,6 +20,7 @@ fn find_head_end(content: &Bytes) -> Option<usize> {
     None
 }
 
+// build a map from the head
 fn build_map(head: &Bytes) -> HashMap<u8, &[u8]> {
     let mut m: HashMap<u8, &[u8]> = HashMap::new();
     for (idx, code) in head.into_iter().step_by(5).enumerate() {
@@ -27,6 +30,7 @@ fn build_map(head: &Bytes) -> HashMap<u8, &[u8]> {
     m
 }
 
+// 
 pub fn decompress(src: String, dest: String) -> Result<usize, DecompressionError> {
     let raw_compressed = fs::read(src);
     if raw_compressed.is_err() {

@@ -5,7 +5,10 @@ pub struct Cluster{
     pub value: u32,
 }
 
+// A cluster containing 4 bytes
 impl Cluster {
+
+    // deconstruct a cluster into individual bytes
     pub fn deconstruct(&self) -> [u8; 4] {
         // fill array with 0
         let mut arr: [u8; 4] = [0; 4];
