@@ -4,9 +4,6 @@ tasks:
   build:
     cmds:
       - cargo build
-  run:
-    cmds:
-      - cargo run
   test:
     cmds:
       - task: build
