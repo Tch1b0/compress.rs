@@ -17,7 +17,7 @@ Decompressed file with 2000 Bytes
 ## stats
 
 Best performance and compression rate for files between 1KB and 5MB.
-File sizes can be reduced to a third/quarter of the original size.
+File sizes are often reduced to a third/quarter of the original size.
 
 ## strategy
 
