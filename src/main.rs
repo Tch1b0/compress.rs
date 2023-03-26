@@ -26,13 +26,13 @@ fn main() {
     let args = Args::parse();
 
     if args.decompress {
-        match decompress(args.source_file, args.dest_file) {
-            Ok(s) => println!("done! New size: {s} Bytes"),
+        match decompress(args.source_file.clone(), args.dest_file.clone()) {
+            Ok(s) => println!("Compressed {} into {} with {s} Bytes", args.source_file, args.dest_file),
             Err(e) => panic!("{e:?}")
         }
     } else {
-        match compress(args.source_file, args.dest_file) {
-            Ok(s) => println!("done! New size: {s} Bytes"),
+        match compress(args.source_file.clone(), args.dest_file.clone()) {
+            Ok(s) => println!("Decompressed {} into {} with {s} Bytes", args.source_file, args.dest_file),
             Err(e) => panic!("{e:?}")
         }
     }
