@@ -67,8 +67,8 @@ After the occurences have been counted, a map containing the occurences and sequ
 Now sequences that are often used get a code assigned to them.
 
 ```
-0b0001: [0101 1011 1100 1010]
-0b0010: [0010 1101 1101 0101]
+0001: [0101 1011 1100 1010]
+0010: [0010 1101 1101 0101]
 ```
 
 And now the file content will be displayed using these shortcuts, while sequences without a shortcut are prefixed with a null byte and just put afterwards.
