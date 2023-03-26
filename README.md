@@ -85,7 +85,7 @@ And now the file content will be displayed using these shortcuts, while sequence
 but the decompressor needs to know what the codes `0001` and `0010` relate to, so we need to serialize the cluster map and put it at the top of the file. To know where the map ends, the end is marked with a null byte.
 
 ```js
-// Map
+// Head/Map
 0001 0101 1011 1100 1010 // "0001 equals the sequence 0101 10..."
 0010 0010 1101 1101 0101 // "0010 equals the sequence 0010 11..."
 
