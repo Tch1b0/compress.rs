@@ -14,6 +14,11 @@ $ compress.rs --source-file ./my-compressed-source-file --dest-file ./my-dest-fi
 Decompressed file with 2000 Bytes
 ```
 
+## stats
+
+Best performance and compression rate for files between 1KB and 5MB.
+File sizes can be reduced to a third/quarter of the original size.
+
 ## strategy
 
 ### compression
